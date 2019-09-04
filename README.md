@@ -1,4 +1,4 @@
-## Ada & Jenna's Lyft Data Challenge 2019
+## Team Jade Lyft Data Challenge 2019
 
 ## Notes
 - [Main Informational Site](https://lyftdatachallenge.splashthat.com)
