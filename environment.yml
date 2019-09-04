@@ -1,0 +1,46 @@
+name: lyft-challenge
+dependencies:
+- blas             
+- ca-certificates  
+- certifi          
+- intel-openmp                
+- libcxx                      
+- libcxxabi                   
+- libedit                     
+- libffi                      
+- libgfortran                 
+- mkl                         
+- mkl-service                 
+- mkl_fft                     
+- mkl_random                  
+- ncurses                     
+- numpy                       
+- numpy-base                  
+- openssl                     
+- pandas                      
+- pip                         
+- python                      
+- python-dateutil             
+- pytz                        
+- readline                    
+- setuptools                  
+- six                         
+- sqlite                      
+- tk                          
+- wheel                       
+- xz                          
+- zlib                       
+- pip
+- pip: 
+  - certifi        
+  - mkl-fft       
+  - mkl-random     
+  - mkl-service   
+  - numpy       
+  - pandas       
+  - pip         
+  - python-dateutil  
+  - pytz         
+  - setuptools   
+  - six         
+  - wheel       
