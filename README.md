@@ -6,9 +6,9 @@
 
 ## Timeline
 - Meeting 1: Brainstorm
-- Meeting 2:
+- Meeting 2 
 - Meeting 3:
-- Meeting 4: + submit
+- Meeting 4: Finish writeup + submit
 - First Round: Sep. 3 - 15
 
 ### DEADLINE: SEP. 15!
