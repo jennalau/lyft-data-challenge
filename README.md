@@ -5,5 +5,10 @@
 - [Challenge FAQ](https://docs.google.com/document/d/1lrCr1d9DPKukdpsLshmDiVGuzgRkpAi9vmHevZGNchk/edit#)
 
 ## Timeline
-- Registration Deadline: Aug. 30
+- Meeting 1: Brainstorm
+- Meeting 2:
+- Meeting 3:
+- Meeting 4: + submit
 - First Round: Sep. 3 - 15
+
+### DEADLINE: SEP. 15!
