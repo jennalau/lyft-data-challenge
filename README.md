@@ -5,10 +5,10 @@
 - [Challenge FAQ](https://docs.google.com/document/d/1lrCr1d9DPKukdpsLshmDiVGuzgRkpAi9vmHevZGNchk/edit#)
 
 ## Timeline
-- Meeting 1: Brainstorm
-- Meeting 2 
-- Meeting 3:
-- Meeting 4: Finish writeup + submit
-- First Round: Sep. 3 - 15
+- Tues, Sep 10: Meeting @ 4-6pm
+- Wed, Sep 11: Work individually
+- Thurs, Sep 12: Meeting @ 4-5:30pm (Start write-up)
+- Fri, Sep 13: Continue write-up (Individual)
+- Sat, Sep. 14: Finish writeup + submit (Individual)
 
 ### DEADLINE: SEP. 15!
