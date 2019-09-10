@@ -12,3 +12,11 @@
 - First Round: Sep. 3 - 15
 
 ### DEADLINE: SEP. 15!
+
+### Analysis
+ - Parse data into working hours of drivers - 1 hour per day
+ - (based on Droped Off - Accepted Ride)
+ - Find average driving time of each driver driving in that interval
+ - Compare efficiency
+
+ - Take an average of the difference between the driver and drive time average over the day
