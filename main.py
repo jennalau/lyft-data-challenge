@@ -50,7 +50,7 @@ def main():
         driver_id = row[0]
         driver_working_data = calculateWorkingMin(row)
 
-        driver_working_data[driver_id] = 
+        driver_working_data[driver_id] = 0
 
         
 
