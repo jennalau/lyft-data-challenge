@@ -14,7 +14,22 @@ def load_data():
 	data_ride_dropped = data_ride_temp[::5]
 	data_ride_accept = np.delete(data_ride_accept, 1, axis=1)
 	data_ride_dropped = np.delete(data_ride_dropped, [0,1], axis=1)
-	print(data_ride_delete[3])
+	dim = data_ride_accept.shape[0]
+	data_ride = np.hstack((data_ride_accept, data_ride_dropped))
+	data = combine_data(data_driver, data_ride)
+	data = np.delete(data, [1,2], axis=1)
+	return data
 
+def combine_data(driver, ride):
+	counter = 0
+	new_data = np.zeros((200000, 5))
+	for j in range(ride.shape[0]):
+		for i in range(driver.shape[0]):
+			if (driver[i, 1] == ride[j, 0]):
+				print("TRUE")
+				new_data[counter] = np.hstack((driver[i], ride[j]))
+				counter += 1
+	new_data = new_data[:counter, :]
+	return new_data
 
 load_data()
