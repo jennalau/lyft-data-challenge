@@ -22,14 +22,16 @@ def load_data():
 
 def combine_data(driver, ride):
 	counter = 0
-	new_data = np.zeros((200000, 5))
-	for j in range(ride.shape[0]):
+	new_data = np.empty((200000, 5), dtype='object')
+	#for j in range(ride.shape[0]):
+	for j in range(5000):
 		for i in range(driver.shape[0]):
 			if (driver[i, 1] == ride[j, 0]):
-				print("TRUE")
 				new_data[counter] = np.hstack((driver[i], ride[j]))
 				counter += 1
-	new_data = new_data[:counter, :]
+	new_data = new_data[:counter-1, :]
+	print(new_data[14])
 	return new_data
 
-load_data()
+a = load_data()
+np.save("loaded_data(3).csv", a)
