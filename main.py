@@ -1,28 +1,6 @@
 import numpy as np
-import datetime as dt
 from driver import *
-
-
-def parseDate(date_string):
-    date_string = date_string.split(" ")
-    day = date_string[0].split("-")
-    time = date_string[1].split(":")
-
-    dateInfo = dt.datetime(day[0], day[1], day[2], time[0], time[1], time[2])
-    return dateInfo
-
-def calculateWorkingMin(row):
-    """
-    calculate driving time (in minutes)
-    
-    """
-    dropped_off_time = parseDate(row[2])
-    accepted_time = parseDate(row[1])
-    time_diff = dropped_off_time - accepted_time
-
-    working_min = time_diff.total_seconds() / 60
-    return working_min
-
+from utils import *
 
 def main():
     """
@@ -31,28 +9,44 @@ def main():
     """
 
     # TODO: get 2D numpy array from parsing data here
+    # read in parsed data 
     parsed_data = np.empty((10, 10)) # placeholder -- modify 
-    print(parsed_data)
+    #parsed_data = load_data()
+
+    
+    # create dictionary (key = id, value = index for lookup in 3D np array)
+    driver_data = dict()
 
     # make set of driver IDs
     driver_set = set(parsed_data[:, 0])
 
-    driver_obj = []
-    for driver_id in driver_set:
-        d = Driver(driver_id, 0)
-        driver_obj.append(d)
+    # populate dict
+    count = 0
+    for d in driver_set:
+        driver_data[d] = count
+        count += 1
 
-    # key=id; value=Driver() object
-    driver_working_data = dict(zip(driver_set, driver_obj))
+
+    # intialize 3D np array to hold all data for [day][driver][hour]
+    working_dataset = np.empty((122, len(driver_set), 24))
 
     # calculate driver's working min
     for row in parsed_data:
+        # get driver id 
         driver_id = row[0]
-        driver_working_data = calculateWorkingMin(row)
 
-        driver_working_data[driver_id] = 0
+        # get driver index
+        driver_index = driver_data[driver_id]
 
-        
+        # get start time / end time 
+        accepted_at_time = row[1]
+        dropped_off_time = row[2]
+
+        # calculate driving min 
+        intIdx = categorizeTimeInterval(accepted_at_time, 
+                                        dropped_off_time, 
+                                        driver_index, 
+                                        working_dataset)
 
     # categorize driver's working min into time intervals
     # num drivers x 24 x 

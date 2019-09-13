@@ -16,5 +16,5 @@ def load_data():
 	data_ride_dropped = np.delete(data_ride_dropped, [0,1], axis=1)
 	print(data_ride_delete[3])
 
-
-load_data()
+if __name__ == '__main__':
+	load_data()

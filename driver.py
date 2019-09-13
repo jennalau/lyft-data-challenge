@@ -1,8 +1,10 @@
+import numpy as np
+
 class Driver():
-    def __init__(self, driver_id, working_time):
+    def __init__(self, driver_id):
         self.driver_id = driver_id
-        self.working_time = working_time 
-    
+        self.driving_time_arr = {} # make this a 2D numpy array
+        
     def getDriverID(self):
         return self.driver_id
 
@@ -11,4 +13,5 @@ class Driver():
 
     def addWorkingTime(self):
         # dict: key = date: value = # mins work 
+        # [date, time-interval-1, time-interval-2, etc.]
 
