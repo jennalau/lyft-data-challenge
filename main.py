@@ -8,11 +8,8 @@ def main():
     check times, put into intervals
     """
 
-    # TODO: get 2D numpy array from parsing data here
     # read in parsed data 
-    parsed_data = np.empty((10, 10)) # placeholder -- modify 
-    #parsed_data = load_data()
-
+    parsed_data = np.load('./data/____')
     
     # create dictionary (key = id, value = index for lookup in 3D np array)
     driver_data = dict()
@@ -39,17 +36,17 @@ def main():
         driver_index = driver_data[driver_id]
 
         # get start time / end time 
-        accepted_at_time = row[1]
-        dropped_off_time = row[2]
+        accepted_at_time = parseDateData(row[1])
+        dropped_off_time = parseDateData(row[2])
 
         # calculate driving min 
         intIdx = categorizeTimeInterval(accepted_at_time, 
                                         dropped_off_time, 
                                         driver_index, 
-                                        working_dataset)
+                                        working_dataset, 
+                                        parsed_data)
 
     # categorize driver's working min into time intervals
-    # num drivers x 24 x 
 
 if __name__ == "__main__":
     main()

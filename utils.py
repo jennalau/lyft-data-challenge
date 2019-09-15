@@ -1,6 +1,7 @@
 import datetime as dt
+from getDayIndex import *
 
-# list of tuples
+# list of tuples with datetime objects
 time_ranges = list(
     (dt.time(0,0,0),  dt.time(0,59,59)), 
     (dt.time(1,0,0),  dt.time(1,59,59)), 
@@ -48,19 +49,16 @@ def parseDateData(date_string):
     dateInfo = dt.datetime(day[0], day[1], day[2], time[0], time[1], time[2])
     return dateInfo
 
-def calculateWorkingMin(row):
+def calculateWorkingMin(start, end):
     """
     Calculate driving time (in minutes)
     """
-    dropped_off_time = parseDateData(row[2])
-    accepted_time = parseDateData(row[1])
-    time_diff = dropped_off_time - accepted_time
-
+    time_diff = start - end
     working_min = time_diff.total_seconds() / 60
     return working_min
 
 
-def categorizeTimeInterval(start_time, end_time, driver_idx, working_dataset):
+def categorizeTimeInterval(start_time, end_time, driver_idx, working_dataset, parsed_data):
     """
     start, end, time: datetime object
     Returns: index of what time interval (for 2d np array)
@@ -68,24 +66,29 @@ def categorizeTimeInterval(start_time, end_time, driver_idx, working_dataset):
     
     # check what time interval it is in
     for time in time_ranges:
-        done = False
-        while(not done):
-            if start_time >= time[0]:
-                    # start/end time exactly within a time interval
-                if end_time <= time[1]:
-                    # calculate index
-                    dayIdx = 0;
-                    timeIdx = time_ranges.index(time)
+        if start_time >= time[0]:
+            # start/end time exactly within a time interval
+            if end_time <= time[1]:
+                # calculate index
+                dayIdx = getDayIndex(start_time)
+                timeIdx = time_ranges.index(time)
 
+                # add to interval
+                working_dataset[dayIdx][driver_idx][timeIdx] = calculateWorkingMin(start_time, end_time)
+                break
 
-                    # add to interval
-                    working_dataset[dayIdx][    ][timeIdx]
-                
+            else:
                 # end time overflows 
-                if end_time > time[1]:
-                    oldTimeIdx = time_ranges.index(start_time)
-                    start_time = time_ranges[oldTimeIdx + 1]
+                while(end_time.time() > time[1]):
+                    # get proper indices
+                    dayIdx = getDayIndex(start_time)
+                    currTimeIdx = time_ranges.index(time)
 
-                    time_diff = time[1] - start_time
+                    # calculate working mins (for current interval)
+                    working_dataset[dayIdx][driver_idx][timeIdx] = calculateWorkingMin(start_time, time[1])
 
-    return -1
+                    # update start_time (FIX THIS... WHAT ABOUT DATE + TIME)
+                    start_time = time[1]
+
+                    # move to next time interval
+                    time = time_ranges.index(currTimeIdx + 1)
