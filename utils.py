@@ -19,6 +19,12 @@ def getDayIndex(a):
 	lookup_table = [0, 31, 61, 92]
 	return (lookup_table[a.month-3] + a.day)
 
+def getDriverID(hashtable, index):
+	for key in hashtable.keys():
+		if hashtable[key] == index:
+			return key
+
+
 def getData():
 	loadData = np.load('loaded_data_CORRECT_bigger.csv.npy', allow_pickle=True)
 	driver_hash = dict()

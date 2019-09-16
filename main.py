@@ -10,7 +10,6 @@ def main():
 
     # load parsed data
     data, driver_hash = getData()
-    # print(data)
 
     # analyze data
     analyze(data, driver_hash)

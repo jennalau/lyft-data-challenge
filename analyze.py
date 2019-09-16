@@ -1,6 +1,7 @@
 from utils import *
 import pandas as pd
-import seaborn as sns
+import seaborn as sns; sns.set()
+import matplotlib.pyplot as plt
 
 def calcTotalDrivingMin(data):
     """
@@ -47,7 +48,7 @@ def calcResidual(data, driver_hash, avg_time):
             r = driver - avg_time
             residuals[driver] += r
 
-            # calculate number of mins. worked
+            # calculate number of minutes worked
             total_min = np.sum(driver)
             driver_working_min[driver] += total_min
     
@@ -56,28 +57,84 @@ def calcResidual(data, driver_hash, avg_time):
     return residuals, driver_working_min
 
 
-def driverEfficiency(residuals, driver_working_min):
-    driver_rankings = []
+def driverEfficiency(residuals, driver_working_min, driver_hash):
+    driver_rankings = dict()
 
     for r in range(len(residuals)):
-        # print(residuals[r])
         sum_r = np.sum(residuals[r])
-        score = sum_r / driver_working_min[r]
-        driver_rankings.append(score)
-    
-    return np.asarray(driver_rankings)
+
+        score = 0
+        if driver_working_min[r] > 0:
+            score = sum_r / driver_working_min[r]
+            # note: we ignored the drivers who were onboarded, but did not work at all 
+
+        driver_rankings[getDriverID(driver_hash, r)] = score
+
+    return driver_rankings
 
 
 def analyze(data, driver_hash):
     # calculate total # of driving minutes for all drivers across the entire dataset timespan for 
     # each 1-hour interval & the # of drivers working in each interval
     totalTime = calcTotalDrivingMin(data) # 24 x 3
-    print("NUM DRIVERS = ", len(driver_hash)) # 46
 
     # calculate residuals for each driver
     avg_times = totalTime[:, -1:]
     residuals, driver_working_min = calcResidual(data, driver_hash, np.squeeze(avg_times, axis=-1))
-    print("residuals: ", residuals.shape)
-    print("driver working minutes: ", driver_working_min)
 
-    driver_rankings = driverEfficiency(residuals, driver_working_min)
+    driver_rankings = driverEfficiency(residuals, driver_working_min, driver_hash)
+
+    # generate visuals
+    visRidePopularity(totalTime[:,0:1])
+
+    compPrimeTime(residuals, driver_working_min, totalTime)
+
+
+def visRidePopularity(mins):
+    time_intervals = [x for x in range(24)]
+
+    print(time_intervals)
+    mins = np.squeeze(mins, axis=-1)
+
+    d = {'Time': time_intervals, 'Average # of Minutes Driven': mins}
+    data = pd.DataFrame(data = d)
+
+    ax = sns.scatterplot(x=data['Time'], y=data['Average # of Minutes Driven'], data=data)
+    fig = ax.get_figure()
+    fig.savefig('ride_popularity.png')
+
+
+def compPrimeTime(residuals, driver_working_min, totalTime):
+
+    print('residuals: ', residuals.shape) # 46 x 24
+
+    resulting_diff = []
+
+    for i in range(24):
+        diff = residuals[:,i:i+1]
+        resulting_diff.append(np.mean(diff))
+
+    print(resulting_diff)
+    means = totalTime[:,0:1]
+    means = np.squeeze(means, axis=-1)
+    resulting_diff = np.asarray(resulting_diff)
+
+    print("means", means.shape)
+    print('resulting_diff: ', resulting_diff.shape)
+
+
+
+    # resulting_diff = np.squeeze(resulting_diff, axis=-1)
+
+
+    d = {'Prime Time': means, 'Residual': resulting_diff}
+    data = pd.DataFrame(data = d)
+
+    ax = sns.scatterplot(x=data['Prime Time'], y=data['Residual'], data=data)
+    fig = ax.get_figure()
+    fig.savefig('prime_time.png')
+
+
+    all_scores = list(zip(resulting_diff, means))
+
+    return all_scores
