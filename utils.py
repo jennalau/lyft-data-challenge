@@ -1,33 +1,5 @@
+import numpy as np
 import datetime as dt
-from getDayIndex import *
-
-# list of tuples with datetime objects
-time_ranges = list(
-    (dt.time(0,0,0),  dt.time(0,59,59)), 
-    (dt.time(1,0,0),  dt.time(1,59,59)), 
-    (dt.time(2,0,0),  dt.time(2,59,59)), 
-    (dt.time(3,0,0),  dt.time(3,59,59)), 
-    (dt.time(4,0,0),  dt.time(4,59,59)), 
-    (dt.time(5,0,0),  dt.time(5,59,59)), 
-    (dt.time(6,0,0),  dt.time(6,59,59)), 
-    (dt.time(7,0,0),  dt.time(7,59,59)), 
-    (dt.time(8,0,0),  dt.time(8,59,59)), 
-    (dt.time(9,0,0),  dt.time(9,59,59)), 
-    (dt.time(10,0,0), dt.time(10,59,59)), 
-    (dt.time(11,0,0), dt.time(11,59,59)), 
-    (dt.time(12,0,0), dt.time(12,59,59)), 
-    (dt.time(13,0,0), dt.time(13,59,59)), 
-    (dt.time(14,0,0), dt.time(14,59,59)), 
-    (dt.time(15,0,0), dt.time(15,59,59)),
-    (dt.time(16,0,0), dt.time(16,59,59)), 
-    (dt.time(17,0,0), dt.time(17,59,59)), 
-    (dt.time(18,0,0), dt.time(18,59,59)), 
-    (dt.time(19,0,0), dt.time(19,59,59)), 
-    (dt.time(20,0,0), dt.time(20,59,59)), 
-    (dt.time(21,0,0), dt.time(21,59,59)),
-    (dt.time(22,0,0), dt.time(22,59,59)), 
-    (dt.time(23,0,0), dt.time(23,59,59)),
-)
 
 def parseDay(day_string):
     return day_string.split("-")
@@ -36,59 +8,57 @@ def parseTime(time_string):
     return time_string.split(":")
 
 def parseDateData(date_string):
-    """
-    Read + parse date/time form CSV file
-
-    Argument: str date (from .csv file)
-    Returns: datetime object 
-    """
     date_string = date_string.split(" ")
     day = parseDay(date_string[0])
     time = parseTime(date_string[1])
+    dateInfo = dt.date(int(day[0]), int(day[1]), int(day[2]))
+    timeInfo = dt.time(int(time[0]), int(time[1]), int(time[2]))
+    return dateInfo, timeInfo
 
-    dateInfo = dt.datetime(day[0], day[1], day[2], time[0], time[1], time[2])
-    return dateInfo
+def getDayIndex(a):
+	lookup_table = [0, 31, 61, 92]
+	return (lookup_table[a.month-3] + a.day)
 
-def calculateWorkingMin(start, end):
-    """
-    Calculate driving time (in minutes)
-    """
-    time_diff = start - end
-    working_min = time_diff.total_seconds() / 60
-    return working_min
+def getData():
+	loadData = np.load('loaded_data_CORRECT_bigger.csv.npy', allow_pickle=True)
+	driver_hash = dict()
+	counter = 0;
+	for driver_id in loadData[:,0]:
+		if (driver_id not in driver_hash):
+			driver_hash[driver_id] = counter
+			counter += 1
 
+	extras = loadData[0]
 
-def categorizeTimeInterval(start_time, end_time, driver_idx, working_dataset, parsed_data):
-    """
-    start, end, time: datetime object
-    Returns: index of what time interval (for 2d np array)
-    """
-    
-    # check what time interval it is in
-    for time in time_ranges:
-        if start_time >= time[0]:
-            # start/end time exactly within a time interval
-            if end_time <= time[1]:
-                # calculate index
-                dayIdx = getDayIndex(start_time)
-                timeIdx = time_ranges.index(time)
+	for row in loadData:
+		date1, time1 = parseDateData(row[1])
+		date2, time2 = parseDateData(row[2])
+		if(date1 == date2):
+			row[1] = time1
+			row[2] = time2
+			row[3] = date1
+		else:
+			row2 = row
+			row[1] = time1
+			row[2] = dt.time(23,59,59)
+			row[3] = date1
+			row2[1] = dt.time(0,0,0)
+			row2[2] = time2
+			row2[3] = date2
+			extras = np.vstack((extras, row2))
 
-                # add to interval
-                working_dataset[dayIdx][driver_idx][timeIdx] = calculateWorkingMin(start_time, end_time)
-                break
+	extras = extras[1:, :]
+	parseData = np.vstack((loadData, extras))
+	
+	data = np.zeros((122, len(driver_hash), 24), dtype=int)
 
-            else:
-                # end time overflows 
-                while(end_time.time() > time[1]):
-                    # get proper indices
-                    dayIdx = getDayIndex(start_time)
-                    currTimeIdx = time_ranges.index(time)
-
-                    # calculate working mins (for current interval)
-                    working_dataset[dayIdx][driver_idx][timeIdx] = calculateWorkingMin(start_time, time[1])
-
-                    # update start_time (FIX THIS... WHAT ABOUT DATE + TIME)
-                    start_time = time[1]
-
-                    # move to next time interval
-                    time = time_ranges.index(currTimeIdx + 1)
+	for row in parseData:
+		driver_index = driver_hash[row[0]]
+		day_index = getDayIndex(row[3])
+		start = dt.datetime.combine(row[3], row[1])
+		end = dt.datetime.combine(row[3], row[2])
+		while(start.hour != end.hour):
+			data[day_index, driver_index, start.hour] = (dt.datetime.combine(row[3], dt.time(start.hour,59,59)) - start).seconds/60
+			start = dt.datetime.combine(row[3], dt.time(start.hour+1,0,0))
+		data[day_index, driver_index, start.hour] = (end - start).seconds/60
+	return data, driver_hash
